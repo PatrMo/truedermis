@@ -1,6 +1,5 @@
 import Image from "next/image";
 
-
 /*
 * TODO:
 * Change this page so that it reflects truedermis rather than nex js
