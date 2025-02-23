@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 
 export const Navbar: React.FC = () => {
     const [isClick, setisClick] = useState(false);
@@ -68,25 +69,25 @@ export const Navbar: React.FC = () => {
             >
                 <div className="px-2 pt-4 pb-4 space-y-1">
                     <a
-                        href="/"
+                        href="/Upload"
                         className="text-white hover:bg-[#031f33] rounded-lg px-5 py-2 transition-colors duration-300 ease-in-out"
                     >
                         Upload
                     </a>
                     <a
-                        href="/"
+                        href="/Results"
                         className="text-white hover:bg-[#031f33] rounded-lg px-5 py-2 transition-colors duration-300 ease-in-out"
                     >
                         Results
                     </a>
                     <a
-                        href="/"
+                        href="/Usage"
                         className="text-white hover:bg-[#031f33] rounded-lg px-5 py-2 transition-colors duration-300 ease-in-out"
                     >
                         Usage
                     </a>
                     <a
-                        href="/"
+                        href="/Purpose"
                         className="text-white hover:bg-[#031f33] rounded-lg px-5 py-2 transition-colors duration-300 ease-in-out"
                     >
                         Purpose

@@ -118,13 +118,13 @@ export default function DragAndDrop() {
               to upload.
             </p>
           </div>
-          <p className="text-sm italic text-gray-500 mb-4">
+          <p className="text-sm italic text-gray-500 dark:text-gray-400 mb-4">
             (Files uploaded should be of type pdf, png, jpg or jpeg).
           </p>
           <div className="flex flex-col items-center">
             {files.map((file: any, idx: any) => (
               <div key={idx} className="flex items-center space-x-4 mb-2">
-                <span className="text-gray-700">{file.name}</span>
+                <span className="text-gray-700 dark:text-gray-300">{file.name}</span>
                 <span
                   className="text-red-500 cursor-pointer"
                   onClick={() => removeFile(idx)}
