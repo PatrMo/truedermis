@@ -1,0 +1,90 @@
+# TrueDermis - Skin Condition Classifier
+
+TrueDermis is a web application that allows users to upload images of skin conditions and receive instant classification results using a deep learning model. This tool is designed for educational purposes and should not be used for self-diagnosis. Always consult a healthcare professional for proper diagnosis and treatment of skin conditions.
+
+## Features
+
+- Upload images of skin conditions
+- Receive instant classification results
+- View detailed predictions with probabilities
+- Responsive design for mobile and desktop
+
+## Technologies Used
+
+- React
+- Next.js
+- Tailwind CSS
+- Axios
+- Formidable
+- Flask (Backend API)
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js
+- npm or yarn
+- Python (for the Flask backend)
+
+### Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/yourusername/truedermis.git
+   cd truedermis
+
+2. Install the dependencies for the frontend:
+
+    ```bash
+    cd frontend
+    npm install
+
+3. Install the dependencies for the backend:
+
+    ```bash
+    cd backend
+    pip install -r requirements.txt
+
+### Running the Application
+
+1. Start the Flask backend:
+
+    ```bash
+    cd backend
+    flask run
+
+2. Start the Next.js frontend:
+
+    ```bash
+    cd frontend
+    npm run dev
+
+3. Open your browser and navigate to http://localhost:3000.
+
+## Usage
+
+1. Drag and drop an image of a skin condition or click to upload.
+2. Wait for the image to be processed.
+3. View the classification results and probabilities.
+
+## Project Structure
+
+The project is organized as follows:
+
+```
+truedermis/
+├── backend/          # Flask backend
+│   ├── app.py        # Main application file
+│   ├── models/       # Machine learning models
+│   ├── static/       # Static files
+│   └── templates/    # HTML templates
+├── frontend/         # Next.js frontend
+│   ├── components/   # React components
+│   ├── pages/        # Next.js pages
+│   ├── public/       # Public assets
+│   └── styles/       # CSS styles
+├── .gitignore        # Git ignore file
+├── README.md         # Project README
+└── package.json      # Frontend package file
+```
