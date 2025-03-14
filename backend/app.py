@@ -15,7 +15,7 @@ app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
 # Load the model
-MODEL_PATH = "skin_condition_classifier.keras"
+MODEL_PATH = 'skin_disease_detection_model.h5'
 model = None
 class_labels = None
 
@@ -33,8 +33,29 @@ def load_classification_model():
                 class_labels = [line.strip() for line in f.readlines()]
         else:
             # Placeholder classes - replace with your actual classes
-            class_labels = ["Acne", "Eczema", "Psoriasis", "Melanoma", "Rosacea", 
-                           "Atopic Dermatitis", "Vitiligo", "Tinea", "Urticaria", "Normal"]
+            class_labels = ["Acne and Rosacea Photos", 
+                            "Actinic Keratosis Basal Cell Carcinoma and other Malignant Lesions", 
+                            "Atopic Dermatitis Photos", 
+                            "Bullous Disease Photos", 
+                            "Cellulitis Impetigo and other Bacterial Infections", 
+                            "Eczema Photos", 
+                            "Exanthems and Drug Eruptions", 
+                            "Hair Loss Photos Alopecia and other Hair Diseases", 
+                            "Herpes HPV and other STDs Photos", 
+                            "Light Diseases and Disorders of Pigmentation",
+                            "Lupus and other Connective Tissue diseases",
+                            "Melanoma Skin Cancer Nevi and Moles",
+                            "Nail Fungus and other Nail Disease",
+                            "Poison Ivy Photos and other Contact Dermatitis",
+                            "Psoriasis pictures Lichen Planus and related diseases",
+                            "Scabies Lyme Disease and other Infestations and Bites",
+                            "Seborrheic Keratoses and other Benign Tumors",
+                            "Systemic Disease",
+                            "Tinea Ringworm Candidiasis and other Fungal Infections",
+                            "Urticaria Hives",
+                            "Vascular Tumors",
+                            "Vasculitis Photos",
+                            "Warts Molluscum and other Viral Infections"]
         
         print(f"Loaded {len(class_labels)} class labels: {class_labels}")
         return True
@@ -67,14 +88,22 @@ def predict():
             file = request.files['file']
             if file.filename == '':
                 return jsonify({"error": "No file selected"}), 400
-            
-            # Save the file temporarily
-            temp_file = tempfile.NamedTemporaryFile(delete=False)
-            file.save(temp_file.name)
-            
-            # Load and preprocess the image
-            img = image.load_img(temp_file.name, target_size=(224, 224))
-            os.unlink(temp_file.name)  # Delete temp file
+
+            # Create a temporary file using a context manager
+            with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+                file_path = temp_file.name
+                file.save(file_path)
+
+            try:
+                # Load and preprocess the image
+                img = image.load_img(file_path, target_size=(224, 224))
+            finally:
+                # Ensure file is closed and deleted even if an error occurs
+                if os.path.exists(file_path):
+                    try:
+                        os.unlink(file_path)
+                    except Exception as e:
+                        print(f"Warning: Could not delete temp file: {e}")
         
         # Handle base64 image
         elif 'image' in request.json:

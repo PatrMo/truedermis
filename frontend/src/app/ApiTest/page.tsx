@@ -63,7 +63,7 @@ export default function Home() {
       // Create form data
       const formData = new FormData();
       formData.append('file', file);
-      
+      console.log("check");
       // Send to API
       const response = await axios.post<PredictionResult>(
         `${API_URL}/predict`,
@@ -72,6 +72,7 @@ export default function Home() {
       );
       
       // Update state with results
+      console.log("check");
       setPredictions(response.data.predictions);
     } catch (err) {
       console.error('Error predicting image:', err);
