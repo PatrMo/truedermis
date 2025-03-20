@@ -71,6 +71,11 @@ TrueDermis is a web application that allows users to upload images of skin condi
 2. Wait for the image to be processed.
 3. View the classification results and probabilities.
 
+## API TEST - Frontend
+
+Navigate to the browser search bar and append /ApiTest to http://localhost:3000.
+It should end up looking like http://localhost:3000/ApiTest. Load that page to test api.
+
 ## Project Structure
 
 The project is organized as follows:
