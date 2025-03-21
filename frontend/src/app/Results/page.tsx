@@ -58,7 +58,7 @@ export default function Results() {
   return (
     <div className="container mx-auto px-4 pt-8">
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-gray-800 dark:text-white">Analysis Results</h1>
+        <h1 className="mt-10 text-4xl font-bold text-gray-800 dark:text-white">Analysis Results</h1>
         <p className="text-lg text-gray-600 dark:text-gray-300 mt-2">
           Here are the predictions for your uploaded image
         </p>
