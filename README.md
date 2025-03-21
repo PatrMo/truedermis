@@ -44,6 +44,8 @@ TrueDermis is a web application that allows users to upload images of skin condi
 
     ```bash
     cd backend
+    py -m vevn .venv
+    .venv\\Scripts\\Activate
     pip install -r requirements.txt
 
 ### Running the Application
@@ -52,7 +54,8 @@ TrueDermis is a web application that allows users to upload images of skin condi
 
     ```bash
     cd backend
-    flask run
+    .venv\\Scripts\\Activate
+    py app.py
 
 2. Start the Next.js frontend:
 
@@ -68,23 +71,28 @@ TrueDermis is a web application that allows users to upload images of skin condi
 2. Wait for the image to be processed.
 3. View the classification results and probabilities.
 
+## API TEST - Frontend
+
+Navigate to the browser search bar and append /ApiTest to http://localhost:3000.
+It should end up looking like http://localhost:3000/ApiTest. Load that page to test api.
+
 ## Project Structure
 
 The project is organized as follows:
 
 ```
 truedermis/
-├── backend/          # Flask backend
-│   ├── app.py        # Main application file
-│   ├── models/       # Machine learning models
-│   ├── static/       # Static files
-│   └── templates/    # HTML templates
-├── frontend/         # Next.js frontend
-│   ├── components/   # React components
-│   ├── pages/        # Next.js pages
-│   ├── public/       # Public assets
-│   └── styles/       # CSS styles
-├── .gitignore        # Git ignore file
-├── README.md         # Project README
-└── package.json      # Frontend package file
+├── backend/            # Flask backend
+│   ├── app.py          # Main application file
+│   ├── class_labels    # Labels of each class
+│   └── skin_disease... # Machine learning model
+├── frontend/           # Next.js frontend
+│   ├── components/     # React components
+│   ├── src/app         # Next.js pages
+│   │   ├── pages       # page views
+│   │   └── Components/ # Frontend components
+│   └── public/         # Public assets
+├── .gitignore          # Git ignore file
+├── README.md           # Project README
+└── package.json        # Frontend package file
 ```
