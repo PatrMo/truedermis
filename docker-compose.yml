@@ -1,0 +1,44 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:5000/api
+    depends_on:
+      - backend
+    networks:
+      - truedermis-network
+    restart: always
+    volumes:
+      - frontend-build:/app/.next
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - MODEL_PATH=/app/model
+    networks:
+      - truedermis-network
+    restart: always
+    volumes:
+      - model-data:/app/model
+      - uploads:/app/uploads
+
+networks:
+  truedermis-network:
+    driver: bridge
+
+volumes:
+  frontend-build:
+  model-data:
+  uploads:
