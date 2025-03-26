@@ -51,12 +51,9 @@ export const Navbar: React.FC = () => {
                     </div>
                     {/* Centered Title */}
                     <div className="flex-grow text-center">
-                        <a
-                            href="/"
-                            className="text-black dark:text-white font-extrabold transition-all duration-300 text-xl sm:text-2xl md:text-3xl"
-                        >
-                            TrueDermis
-                        </a>
+                    <Link href="/" className="text-black dark:text-white font-extrabold transition-all duration-300 text-xl sm:text-2xl md:text-3xl">
+                        TrueDermis
+                    </Link>
                     </div>
                 </div>
             </div>
@@ -68,30 +65,30 @@ export const Navbar: React.FC = () => {
                 
             >
                 <div className="px-2 pt-4 pb-4 space-y-1">
-                    <a
+                    <Link
                         href="/Upload"
                         className="text-white hover:bg-[#031f33] rounded-lg px-5 py-2 transition-colors duration-300 ease-in-out"
                     >
                         Upload
-                    </a>
-                    <a
+                    </Link>
+                    <Link
                         href="/Results"
                         className="text-white hover:bg-[#031f33] rounded-lg px-5 py-2 transition-colors duration-300 ease-in-out"
                     >
                         Results
-                    </a>
-                    <a
+                    </Link>
+                    <Link
                         href="/Usage"
                         className="text-white hover:bg-[#031f33] rounded-lg px-5 py-2 transition-colors duration-300 ease-in-out"
                     >
                         Usage
-                    </a>
-                    <a
+                    </Link>
+                    <Link
                         href="/Purpose"
                         className="text-white hover:bg-[#031f33] rounded-lg px-5 py-2 transition-colors duration-300 ease-in-out"
                     >
                         Purpose
-                    </a>
+                    </Link>
                 </div>
             </div>
         </nav>

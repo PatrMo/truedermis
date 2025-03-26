@@ -1,7 +1,7 @@
 // pages/api/predict.ts - API route to proxy requests to the Flask backend
 import type { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
-import formidable from 'formidable';
+import formidable, { File } from 'formidable';
 import { createReadStream } from 'fs';
 import FormData from 'form-data';
 
@@ -25,18 +25,22 @@ export default async function handler(
   try {
     // Parse the multipart form data
     const form = new formidable.IncomingForm();
-    
-    const [fields, files] = await new Promise<[formidable.Fields, formidable.Files]>((resolve, reject) => {
+
+    const [, files] = await new Promise<[formidable.Fields, formidable.Files]>((resolve, reject) => {
       form.parse(req, (err, fields, files) => {
         if (err) reject(err);
         resolve([fields, files]);
       });
     });
 
-    // Get the file
-    const file = files.file;
-    if (!file || Array.isArray(file)) {
-      return res.status(400).json({ error: 'No file uploaded' });
+    // Ensure file is correctly typed
+    let file: File | undefined;
+    if (files.file) {
+      file = Array.isArray(files.file) ? files.file[0] : files.file;
+    }
+
+    if (!file || !file.filepath) {
+      return res.status(400).json({ error: 'No file uploaded or invalid file data' });
     }
 
     // Create form data for the API request
