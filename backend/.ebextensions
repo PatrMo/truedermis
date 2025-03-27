@@ -1,0 +1,7 @@
+option_settings:
+  aws:elasticbeanstalk:container:python:
+    WSGIPath: app:app
+  aws:elasticbeanstalk:application:environment:
+    PYTHONPATH: "/var/app/current:$PYTHONPATH"
+    MODEL_PATH: "/var/app/current/skin_disease_detection_model.h5"
+
