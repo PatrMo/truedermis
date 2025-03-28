@@ -1,5 +1,39 @@
-flask 
-flask-cors 
-tensorflow 
-pillow 
-numpy
+Flask==2.1.0
+flask-cors==3.0.10
+tensorflow==2.18.1
+Pillow==9.1.0
+numpy==1.21.5
+gunicorn==20.1.0
+boto3==1.21.0
+```
+
+c) Startup Script for Debugging
+<antArtifact identifier="startup-script" type="application/vnd.ant.code" language="python" title="Debugging Startup Script">
+import logging
+import sys
+
+# Configure logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('/var/log/eb-deploy.log'),
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+
+def log_system_info():
+    import platform
+    import os
+
+    logging.info(f"Python Version: {platform.python_version()}")
+    logging.info(f"Current Working Directory: {os.getcwd()}")
+    logging.info(f"System Path: {sys.path}")
+    
+    try:
+        import tensorflow as tf
+        logging.info(f"TensorFlow Version: {tf.__version__}")
+    except ImportError:
+        logging.error("TensorFlow import failed")
+
+log_system_info()

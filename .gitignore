@@ -1,7 +1,6 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-*/.next
 */node_modules
 /.pnp
 .pnp.*
@@ -15,7 +14,7 @@
 /coverage
 
 # next.js
-/.next/
+*/.next/
 /out/
 
 # production
@@ -32,6 +31,10 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+*.env
+
+# deployment
+*.sh
 
 .venv/
 
@@ -41,3 +44,17 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+*/aws/*
+*/.elasticbeanstalk
+*/.elasticbeanstalk/*
+*/__pycache__/*
+
+*.zip
+
+# Elastic Beanstalk Files
+*.elasticbeanstalk/*
+*!.elasticbeanstalk/*.cfg.yml
+*!.elasticbeanstalk/*.global.yml
+
+*.sh

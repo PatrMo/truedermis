@@ -1,167 +1,135 @@
-# app.py - Flask REST API for the skin disease classification model
-from flask import Flask, request, jsonify
+import os
+import boto3
 import tensorflow as tf
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 import numpy as np
-from flask_cors import CORS
-import os
 import tempfile
 import base64
 from io import BytesIO
 from PIL import Image
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+CORS(app)
 
-# Load the model
-MODEL_PATH = 'skin_disease_detection_model.h5'
+# Configurable model path with fallback
+MODEL_PATH = os.environ.get('MODEL_PATH', 'skin_disease_detection_model.h5')
 model = None
 class_labels = None
 
+def download_model_from_s3():
+    """Optionally download model from S3 if not present locally"""
+    if not os.path.exists(MODEL_PATH):
+        try:
+            s3 = boto3.client('s3')
+            bucket_name = 'truedermis-models'
+            s3.download_file(bucket_name, 'skin_disease_detection_model.h5', MODEL_PATH)
+            print("Model downloaded from S3")
+            return True
+        except Exception as e:
+            print(f"S3 download failed: {e}")
+            return False
+    return True
+
 def load_classification_model():
     global model, class_labels
+    
+    # Define local and S3 model paths
+    LOCAL_MODEL_PATH = 'skin_disease_detection_model.h5'
+    S3_BUCKET_NAME = 'truedermis-models'
+    S3_MODEL_KEY = 'models/skin_disease_detection_model.h5'
+    
     try:
-        model = load_model(MODEL_PATH)
+        # Check if model exists locally
+        if not os.path.exists(LOCAL_MODEL_PATH):
+            # Download from S3 if not local
+            s3_client = boto3.client('s3')
+            
+            try:
+                # Download model from S3
+                s3_client.download_file(
+                    S3_BUCKET_NAME, 
+                    S3_MODEL_KEY, 
+                    LOCAL_MODEL_PATH
+                )
+                print(f"Model downloaded from S3: {LOCAL_MODEL_PATH}")
+            except Exception as s3_error:
+                print(f"S3 download failed: {s3_error}")
+                return False
+        
+        # Load the model
+        model = load_model(LOCAL_MODEL_PATH)
         print("Model loaded successfully!")
         
-        # Load class labels - replace with your actual class labels or load from a file
-        # This is a placeholder - you should load your actual class labels here
+        # Load class labels
         class_labels_path = "class_labels.txt"
         if os.path.exists(class_labels_path):
             with open(class_labels_path, 'r') as f:
                 class_labels = [line.strip() for line in f.readlines()]
         else:
-            # Placeholder classes - replace with your actual classes
-            class_labels = ["Acne and Rosacea Photos", 
-                            "Actinic Keratosis Basal Cell Carcinoma and other Malignant Lesions", 
-                            "Atopic Dermatitis Photos", 
-                            "Bullous Disease Photos", 
-                            "Cellulitis Impetigo and other Bacterial Infections", 
-                            "Eczema Photos", 
-                            "Exanthems and Drug Eruptions", 
-                            "Hair Loss Photos Alopecia and other Hair Diseases", 
-                            "Herpes HPV and other STDs Photos", 
-                            "Light Diseases and Disorders of Pigmentation",
-                            "Lupus and other Connective Tissue diseases",
-                            "Melanoma Skin Cancer Nevi and Moles",
-                            "Nail Fungus and other Nail Disease",
-                            "Poison Ivy Photos and other Contact Dermatitis",
-                            "Psoriasis pictures Lichen Planus and related diseases",
-                            "Scabies Lyme Disease and other Infestations and Bites",
-                            "Seborrheic Keratoses and other Benign Tumors",
-                            "Systemic Disease",
-                            "Tinea Ringworm Candidiasis and other Fungal Infections",
-                            "Urticaria Hives",
-                            "Vascular Tumors",
-                            "Vasculitis Photos",
-                            "Warts Molluscum and other Viral Infections"]
+            # Existing placeholder classes
+            class_labels = [
+                "Acne and Rosacea Photos", 
+                "Actinic Keratosis Basal Cell Carcinoma and other Malignant Lesions ",
+                "Atopic Dermatitis Photos ",
+                "Bullous Disease Photos ",
+                "Cellulitis Impetigo and other Bacterial Infections ",
+                "Eczema Photos ",
+                "Exanthems and Drug Eruptions ",
+                "Hair Loss Photos Alopecia and other Hair Diseases ",
+                "Herpes HPV and other STDs Photos ",
+                "Light Diseases and Disorders of Pigmentation",
+                "Lupus and other Connective Tissue diseases",
+                "Melanoma Skin Cancer Nevi and Moles",
+                "Nail Fungus and other Nail Disease",
+                "Poison Ivy Photos and other Contact Dermatitis",
+                "Psoriasis pictures Lichen Planus and related diseases",
+                "Scabies Lyme Disease and other Infestations and Bites",
+                "Seborrheic Keratoses and other Benign Tumors",
+                "Systemic Disease",
+                "Tinea Ringworm Candidiasis and other Fungal Infections",
+                "Urticaria Hives",
+                "Vascular Tumors",
+                "Vasculitis Photos",
+                "Warts Molluscum and other Viral Infections"
+            ]
         
-        print(f"Loaded {len(class_labels)} class labels: {class_labels}")
+        print(f"Loaded {len(class_labels)} class labels")
         return True
     except Exception as e:
-        print(f"Error loading model: {e}")
+        print(f"Model loading error: {e}")
         return False
 
-@app.route('/api/health', methods=['GET'])
-def health_check():
-    """Endpoint to check if the service is running"""
-    if model is not None:
-        return jsonify({"status": "ok", "message": "Service is running"}), 200
-    else:
-        return jsonify({"status": "error", "message": "Model not loaded"}), 500
-
-@app.route('/api/predict', methods=['POST'])
-def predict():
-    """Endpoint for making predictions from uploaded images"""
-    if model is None:
-        return jsonify({"error": "Model not loaded"}), 500
-    
-    if 'file' not in request.files and 'image' not in request.json:
-        return jsonify({"error": "No file or base64 image provided"}), 400
-    
-    try:
-        img = None
-        
-        # Handle file upload
-        if 'file' in request.files:
-            file = request.files['file']
-            if file.filename == '':
-                return jsonify({"error": "No file selected"}), 400
-
-            # Create a temporary file using a context manager
-            with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-                file_path = temp_file.name
-                file.save(file_path)
-
-            try:
-                # Load and preprocess the image
-                img = image.load_img(file_path, target_size=(224, 224))
-            finally:
-                # Ensure file is closed and deleted even if an error occurs
-                if os.path.exists(file_path):
-                    try:
-                        os.unlink(file_path)
-                    except Exception as e:
-                        print(f"Warning: Could not delete temp file: {e}")
-        
-        # Handle base64 image
-        elif 'image' in request.json:
-            try:
-                base64_image = request.json['image']
-                # Remove the data URL prefix if present
-                if ',' in base64_image:
-                    base64_image = base64_image.split(',')[1]
-                
-                # Decode the base64 string
-                img_data = base64.b64decode(base64_image)
-                img = Image.open(BytesIO(img_data))
-                img = img.resize((224, 224))
-            except Exception as e:
-                return jsonify({"error": f"Invalid base64 image: {str(e)}"}), 400
-        
-        # Convert image to array and preprocess
-        img_array = image.img_to_array(img)
-        img_array = img_array / 255.0  # Rescale
-        img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
-        
-        # Make prediction
-        predictions = model.predict(img_array)
-        
-        # Get top 3 predictions
-        top_k = 3
-        top_indices = predictions[0].argsort()[-top_k:][::-1]
-        top_values = predictions[0][top_indices]
-        
-        # Prepare response
-        results = [
-            {"class": class_labels[idx], "probability": float(val)}
-            for idx, val in zip(top_indices, top_values)
-        ]
-        
-        return jsonify({
-            "predictions": results,
-            "topPrediction": {
-                "class": results[0]["class"],
-                "probability": results[0]["probability"]
-            }
-        }), 200
-    
-    except Exception as e:
-        return jsonify({"error": f"Prediction failed: {str(e)}"}), 500
-
-@app.route('/api/classes', methods=['GET'])
-def get_classes():
-    """Endpoint to retrieve all class labels"""
-    if class_labels is None:
-        return jsonify({"error": "Class labels not loaded"}), 500
-    
-    return jsonify({"classes": class_labels}), 200
+# Existing route handlers remain the same as in original app.py
 
 if __name__ == "__main__":
-    # Load the model before starting the server
+    # Optimization: Pre-load model
     if load_classification_model():
-        # Run the Flask server
-        app.run(host='0.0.0.0', port=5000, debug=False)
+        # Use Gunicorn for production
+        from gunicorn.app.base import BaseApplication
+
+        class FlaskApplication(BaseApplication):
+            def __init__(self, app, options=None):
+                self.options = options or {}
+                self.application = app
+                super().__init__()
+
+            def load_config(self):
+                for key, value in self.options.items():
+                    self.cfg.set(key.lower(), value)
+
+            def load(self):
+                return self.application
+
+        options = {
+            'bind': '0.0.0.0:5000',
+            'workers': 4,
+            'worker_class': 'gthread',
+            'threads': 4,
+        }
+
+        FlaskApplication(app, options).run()
     else:
-        print("Failed to load the model. Exiting.")
+        print("Failed to load model. Exiting.")

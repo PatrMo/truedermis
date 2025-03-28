@@ -12,7 +12,7 @@ export const config = {
   },
 };
 
-const API_URL = process.env.API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.BACKEND_API_URL || 'http://localhost:5000/api';
 
 export default async function handler(
   req: NextApiRequest,

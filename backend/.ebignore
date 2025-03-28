@@ -1,0 +1,27 @@
+*.h5
+# Ignore virtual environment directories
+.venv/
+env/
+venv/
+
+# Ignore node_modules directory
+node_modules/
+
+# Ignore Python bytecode files
+*.pyc
+*.pyo
+__pycache__/
+
+# Ignore system files
+.DS_Store
+
+# Ignore log files
+*.log
+
+# Ignore IDE/editor configuration files
+.vscode/
+.idea/
+
+# Ignore OS-generated files
+Thumbs.db
+ehthumbs.db
